@@ -1,0 +1,246 @@
+<script type="text/x-red" data-template-name="mode">
+     <div class="form-row">
+        <label for="node-input-user"> Futurehome site</label>
+        <input type="text" id="node-input-user">
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-mode"> Set mode</label>
+        <select id="node-input-mode">
+            <option value=""> -- select a mode -- </option>
+            <option value="home">Home</option>
+            <option value="away">Away</option>
+            <option value="sleep">Sleep</option>
+            <option value="vacation">Vacation</option>
+        </select>
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="mode">
+    <p>Select the mode to change to or input a JSON msg: { mode: 'home' } to change mode to home mode.</p>
+    <p>If input is something else (like timestamp) the mode on the node will be set.</p>
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('mode',{
+        category: 'futurehome',
+        color: '#EF4C57',
+        defaults: {
+            user: {type:"futurehome-login",required:true},
+            name: {value:""},
+            mode: {value:""}
+        },
+        inputs:1,
+        outputs:0,
+        icon: "mode.png",
+        align: 'right',
+        paletteLabel: function() {
+            return "change mode";
+        },
+        label: function() {
+            return this.name||"change mode";
+        },
+        oneditprepare: function() {
+            function changeMode() {
+                $("#node-input-name").val($('#node-input-mode option:selected').text() + " mode");
+            }
+            $('#node-input-mode').on('change', changeMode)
+            
+        },
+        oneditsave: function() {
+            this.mode = $('#node-input-mode option:selected').val();
+            $("#node-input-name").val($('#node-input-mode option:selected').text() + " mode");
+            //console.log(this.mode);
+        },
+        oneditcancel: function() {
+        }
+    });
+</script>
+
+
+<script type="text/x-red" data-template-name="change-device">
+     <div class="form-row">
+        <label for="node-input-user"> Futurehome site</label>
+        <input type="text" id="node-input-user">
+    </div>
+     <div class="form-row">
+        <label for="node-input-device"> Device</label>
+        <input type="text" id="node-input-device" style="width: 60%;" />
+        <a id="node-input-device-scan" class="btn"><i class="fa fa-search"></i></a>
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="change-device">
+    <p>Select the device to change.</p>
+    <p>Input must be a JSON msg { power: 'on'/'off' }, { dimValue: '50'} 0..100 allowed.</p>
+    <p>Or a string with the value on or off </p>
+    <p>Or an int with a value between 0-100, only for dimmable devices.</p>
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('change-device',{
+        category: 'futurehome',
+        color: '#EF4C57',
+        defaults: {
+            user: {type:"futurehome-login",required:true},
+            device: {value:"",required:true},
+            device_id: {value:"",required:true},
+            name: {value:""}
+        },
+        inputs:1,
+        outputs:0,
+        icon: "device.png",
+        align: 'right',
+        paletteLabel: function() {
+            return "change a device";
+        },
+        label: function() {
+            return this.name||"change a device";
+        },
+        oneditprepare: function() {
+            var user_id = this.user;
+
+            if (!user_id) {
+                //console.log("No user!");
+                $('#node-input-device').prop("readonly",true);
+                $('#node-input-device-scan').attr("disabled", true);
+            } else {
+                //console.log("have user");
+                $('#node-input-device').prop("readonly",false);
+                $('#node-input-device-scan').attr("disabled",false);
+            }
+
+            function changeDevice() {
+                this.device = $('#node-input-device option:selected').text();
+                $("#node-input-name").val($('#node-input-device option:selected').text());
+                this.device_id = $('#node-input-device option:selected').val();
+            }            
+
+            $("#node-input-device-scan").click(function(e) {
+                var url = 'input/devices?id='+user_id;
+                $.get(url, function(data,status) {
+                    if (status == "success") {
+                        //console.log("Devices recived: ");
+                        //console.log(data);
+                        $('#node-input-device').replaceWith('<select id="node-input-device" style="width: 60%;"></select>');
+                        $('#node-input-device').on('change', changeDevice)
+                        data.forEach(function(device){
+                            //console.log(device.name + device.id);
+                            $('#node-input-device').append('<option value="' + device.id + '">' + device.name + '</option>');
+                        });
+                    }
+                });
+
+            });            
+
+        },
+        oneditsave: function() {
+            this.device = $('#node-input-device option:selected').text();
+            $("#node-input-name").val($('#node-input-device option:selected').text());
+            this.device_id = $('#node-input-device option:selected').val();
+        },
+        oneditcancel: function() {
+        }
+    });
+</script>
+
+
+
+
+<script type="text/x-red" data-template-name="shortcut">
+     <div class="form-row">
+        <label for="node-input-user"> Futurehome site</label>
+        <input type="text" id="node-input-user">
+    </div>
+     <div class="form-row">
+        <label for="node-input-shortcut"> Device</label>
+        <input type="text" id="node-input-shortcut" style="width: 60%;" />
+        <a id="node-input-shortcut-scan" class="btn"><i class="fa fa-search"></i></a>
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="shortcut">
+    <p>Get a list of shortcuts. Select a shortcut to run, or input the shortcut number to run.</p>
+    <p>If input is something else (like timestamp) the selected shortcut will run.</p>
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('shortcut',{
+        category: 'futurehome',
+        color: '#EF4C57',
+        defaults: {
+            user: {type:"futurehome-login",required:true},
+            name: {value:""},
+            shortcut_name: {value:""},
+            shortcut_id: {value:""}
+        },
+        inputs:1,
+        outputs:0,
+        icon: "shortcut.png",
+        align: 'right',
+        paletteLabel: function() {
+            return "run shortcut";
+        },
+        label: function() {
+            return this.name||"run shortcut";
+        },
+        oneditprepare: function() {
+            var user_id = this.user;
+
+            if (!user_id) {
+                //console.log("No user!");
+                $('#node-input-shortcut').prop("readonly",true);
+                $('#node-input-shortcut-scan').attr("disabled", true);
+            } else {
+                //console.log("have user");
+                 $('#node-input-shortcut').prop("readonly",false);
+                 $('#node-input-shortcut-scan').attr("disabled",false);
+            }
+
+            function changeShortcut() {
+                this.shortcut_name = $('#node-input-shortcut option:selected').text();
+                $("#node-input-name").val($('#node-input-shortcut option:selected').text());
+                //console.log(this.shortcut_name);
+                this.shortcut_id = $('#node-input-shortcut option:selected').val();
+                //console.log(this.shortcut_id);
+            }            
+
+            $("#node-input-shortcut-scan").click(function(e) {
+                var url = 'output/shortcuts?id='+user_id;
+                $.get(url, function(data,status) {
+                    if (status == "success") {
+                        //console.log("Shortcuts recived: ");
+                        //console.log(data);
+                        $('#node-input-shortcut').replaceWith('<select id="node-input-shortcut" style="width: 60%;"></select>');
+                        $('#node-input-shortcut').on('change', changeShortcut)
+                        data.forEach(function(shortcut){
+                            //console.log(shortcut.name + " " + shortcut.id);
+                            $('#node-input-shortcut').append('<option value="' + shortcut.id + '">' + shortcut.name + '</option>');
+                        });
+                    }
+                });
+            });            
+        },
+        oneditsave: function() {
+            this.shortcut_name = $('#node-input-shortcut option:selected').text();
+            $("#node-input-name").val($('#node-input-shortcut option:selected').text());
+            //console.log(this.shortcut_name);
+            this.shortcut_id = $('#node-input-shortcut option:selected').val();
+            //console.log(this.shortcut_id);
+        },
+        oneditcancel: function() {
+        }
+    });
+</script>
+

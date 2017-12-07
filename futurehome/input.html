@@ -1,0 +1,133 @@
+<script type="text/x-red" data-template-name="site">
+     <div class="form-row">
+        <label for="node-input-user"> Futurehome site</label>
+        <input type="text" id="node-input-user">
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="site">
+    <p>Node that connects to a Futurehome site using API websocket.</p>
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('site',{
+        category: 'futurehome',
+        color: '#EF4C57',
+        defaults: {
+            user: {type:"futurehome-login",required:true},
+            name: {value:""}
+        },
+        inputs:0,
+        outputs:1,
+        icon: "site.png",
+        paletteLabel: function() {
+            return "connect to site";
+        },
+        label: function() {
+            return this.name || "connect to site"
+        },
+        oneditprepare: function() {
+
+        },
+        oneditsave: function() {
+            $("#node-input-name").val($('#node-input-user option:selected').text());
+        },
+        oneditcancel: function() {
+        }
+    });
+</script>
+
+
+
+<script type="text/x-red" data-template-name="device">
+     <div class="form-row">
+        <label for="node-input-user"> Futurehome site</label>
+        <input type="text" id="node-input-user">
+    </div>
+     <div class="form-row">
+        <label for="node-input-device"> Device</label>
+        <input type="text" id="node-input-device" style="width: 60%;" />
+        <a id="node-input-device-scan" class="btn"><i class="fa fa-search"></i></a>
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="device">
+    <p>Node that connects to a Futurehome device using API websocket.</p>
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('device',{
+        category: 'futurehome',
+        color: '#EF4C57',
+        defaults: {
+            user: {type:"futurehome-login",required:true},
+            device: {value:"",required:true},
+            device_id: {value:"",required:true},
+            name: {value:""}
+        },
+        inputs:0,
+        outputs:1,
+        icon: "device.png",
+        paletteLabel: function() {
+            return "connect to device";
+        },
+        label: function() {
+            return this.name || this.device ||"connect to device";
+        },
+        oneditprepare: function() {
+            var id = this.id;
+            var user_id = this.user;
+
+            if (!user_id) {
+                //console.log("No user!");
+                $('#node-input-device').prop("readonly",true);
+                $('#node-input-device-scan').attr("disabled", true);                
+            } else {
+                //console.log("have user");
+                $('#node-input-device').prop("readonly",false);
+                $('#node-input-device-scan').attr("disabled",false);
+            }
+
+            function changeDevice() {
+                this.device = $('#node-input-device option:selected').text();
+                $("#node-input-name").val($('#node-input-device option:selected').text());
+                this.device_id = $('#node-input-device option:selected').val();
+            }
+
+            $("#node-input-device-scan").click(function(e) {
+                var url = 'input/devices?id='+user_id;
+                $.get(url, function(data,status) {
+                    if (status == "success") {
+                        //console.log("Devices recived: ");
+                        //console.log(data);
+                        $('#node-input-device').replaceWith('<select id="node-input-device" style="width: 60%;"></select>');
+                        $('#node-input-device').on('change', changeDevice)
+                        data.forEach(function(device){
+                            //console.log(device.name + device.id);
+                            $('#node-input-device').append('<option value="' + device.id + '">' + device.name + '</option>');
+                        });
+                    }
+                });
+
+            });
+        },
+        oneditsave: function() {
+            this.device = $('#node-input-device option:selected').text();
+            $("#node-input-name").val($('#node-input-device option:selected').text());
+            this.device_id = $('#node-input-device option:selected').val();
+        }
+    });
+</script>
+
+
+
+
+

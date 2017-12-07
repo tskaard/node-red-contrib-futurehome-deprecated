@@ -1,0 +1,174 @@
+<script type="text/x-red" data-template-name="futurehome-login">
+    <div id="node-config-futurehome-login">
+        <div class="form-row">
+            <label for="node-config-input-username"><i class="fa fa-user"></i> Username</label>
+            <input type="text" id="node-config-input-username">
+        </div>
+        <div class="form-row">
+            <label for="node-config-input-password"><i class="fa fa-key"></i> Password</label>
+            <input type="password" id="node-config-input-password">
+        </div>
+        <div class="form-row">
+            <label>&nbsp;</label>
+            <input type="checkbox" id="node-config-input-beta" name="beta" style="display: inline-block; width: auto;"> Beta</input>
+            &nbsp;&nbsp;&nbsp;
+            <a class="btn" id="node-config-login"> Login</a>
+
+        </div>
+    </div>
+    <div id="node-config-futurehome-site">
+        <div class="form-row">
+            <label><i class="fa fa-user"></i> User</label><span id="node-config-futurehome-displayName" class="input-xlarge uneditable-input"></span>
+        </div>
+        <div class="form-row">
+            <label for="node-input-site"> Site</label>
+            <input type="text" id="node-input-site" style="width: 60%;" />
+            <a id="node-input-site-scan" class="editor-button"><i class="fa fa-search"></i></a>
+        </div>
+        <input type="hidden" id="node-config-input-displayName">
+    </div>
+</script>
+
+<script type="text/javascript">
+(function() {
+    RED.nodes.registerType('futurehome-login',{
+        category: 'config',
+        defaults: {
+            displayName: {value:""},
+            site_name: {value:""},
+            base_uri: {value: "futurehome.no/"},
+            username: {value: ""}
+        },
+        credentials: {
+            username: {type:"text"},
+            password: {type:"password"},
+            access_token: {type:"password"},
+            refresh_token: {type:"password"},
+            site_id: {type:"text"},
+            base_uri: {type:"text"},
+            client_id: {type:"password"},
+            client_secret: {type:"password"},
+            expires_in: {type:"text"},
+            expire_time: {type: "text"}
+        },
+        label: function() {
+            return this.site_name || ""
+            //return this.displayName; // TODO: fix this
+        },
+        exportable: false,
+        oneditprepare: function() {
+            var id = this.id;
+            var base_uri = "futurehome.no/";
+            
+            function updateFuturehomeLoginButton() {
+                var v1 = $("#node-config-input-username").val();
+                var v2 = $("#node-config-input-password").val();
+                $("#node-config-login").toggleClass("disabled",(v1.length === 0 || v2.length === 0));
+            }
+
+            $("#node-config-input-username").on('change keydown paste input',updateFuturehomeLoginButton);
+            $("#node-config-input-password").on('change keydown paste input',updateFuturehomeLoginButton);
+
+            function updateFuturehomeDisplayName(dn) {
+                $("#node-config-futurehome-login").hide();
+                $("#node-config-futurehome-site").show();
+                $("#node-config-input-displayName").val(dn);
+                $("#node-config-futurehome-displayName").html(dn);
+            }
+
+            function updateBaseUri(uri){
+                base_uri = uri;
+            }
+
+            function changeSite() {
+                this.site_name = $('#node-input-site option:selected').text();
+                var url = 'futurehome-login/set_site?id='+id+'&site_id='+$('#node-input-site option:selected').val();
+                $.post(url, function(data, status) {
+                    if (status == "success") {
+                    } else {
+                        console.log("error!")
+                    }
+                });
+            }
+
+            updateFuturehomeLoginButton();
+
+            if (this.displayName) {
+                updateFuturehomeDisplayName(this.displayName);
+            } else {
+                $("#node-config-futurehome-login").show();
+                $("#node-config-futurehome-site").hide();
+                $("#node-config-dialog-ok").button("disable");
+            }
+
+            $("#node-config-input-beta").change(function(e) {
+                if (this.checked) {
+                    updateBaseUri("beta.futurehome.no/");
+                } else{
+                    updateBaseUri("futurehome.no/");
+                }
+            });
+
+            $("#node-input-site-scan").click(function(e) {
+                // user is loged in, get list og sites
+                var url = 'futurehome-login/sites?id='+id;
+                $.get(url, function(data,status) {
+                    if (status == "success") {
+                        //console.log("Sites recived: ");
+                        //console.log(data);
+                        $('#node-input-site').replaceWith('<select id="node-input-site" style="width: 60%;"></select>');
+                        $('#node-input-site').on('change', changeSite);
+                        data.forEach(function(site){
+                            //console.log(site.name + " "+ site.id);
+                            $('#node-input-site').append('<option value="' + site.id + '">' + site.name + '</option>');
+                        });
+                        // Check if site is selected. use $.get to set site_id on credentials.
+                        $("#node-config-dialog-ok").button("enable");
+                    }
+                });
+            });
+
+            $("#node-config-login").click(function(e) {
+                var userName = $("#node-config-input-username").val();
+                var password = $("#node-config-input-password").val();
+                if (userName === "" || password === "") {
+                    e.preventDefault();
+                } else {
+                    var url = 'futurehome-login/auth?id='+id+'&userName='+userName+"&password="+password+'&base_uri='+base_uri;
+                    $.get(url, function(data,status) {
+                        //console.log("Data recived: ");
+                        //console.log(data);
+                        if (status == "success") {
+                            // New function for getting Name and activating add button and switching view
+                            var urlAuthCheck = 'futurehome-login/user-info?id='+id;
+                            $.get(urlAuthCheck, function(data,status) {
+                                if (!data.firstname) {
+                                    //console.log(status);
+                                    //console.log(data);
+                                } else {
+                                    //console.log(data);
+                                    updateFuturehomeDisplayName(data.firstname);
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+            
+        },
+        oneditsave: function() {
+            var id = this.id;
+            this.site_name = $('#node-input-site option:selected').text();
+            var url = 'futurehome-login/set_site?id='+id+'&site_id='+$('#node-input-site option:selected').val();
+                $.post(url, function(data, status) {
+                    if (status == "success") {
+                    } else {
+                        console.log("error!")
+                    }
+                });
+        },
+        oneditcancel: function() {
+        }
+    });
+})();
+</script>
