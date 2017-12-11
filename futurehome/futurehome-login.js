@@ -150,10 +150,12 @@ module.exports = function(RED) {
         }, function(err, result, data) {
             if (err) {
                 console.log("request error:" + err);
+                res.sendStatus(400);
                 return;
             }
             if (data.error) {
                 console.log("oauth error: " + data.error);
+                res.sendStatus(400);
                 return;
             }
             //console.log(data);

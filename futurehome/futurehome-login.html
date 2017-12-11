@@ -114,6 +114,7 @@
                 var url = 'futurehome-login/sites?id='+id;
                 $.get(url, function(data,status) {
                     if (status == "success") {
+                        RED.notify("Got sites","success");
                         //console.log("Sites recived: ");
                         //console.log(data);
                         $('#node-input-site').replaceWith('<select id="node-input-site" style="width: 60%;"></select>');
@@ -124,6 +125,8 @@
                         });
                         // Check if site is selected. use $.get to set site_id on credentials.
                         $("#node-config-dialog-ok").button("enable");
+                    } else {
+                        RED.notify("Something went wrong while trying to get sites.","error");
                     }
                 });
             });
@@ -143,14 +146,19 @@
                             var urlAuthCheck = 'futurehome-login/user-info?id='+id;
                             $.get(urlAuthCheck, function(data,status) {
                                 if (!data.firstname) {
+                                    RED.notify("Could not get user information.","error");
                                     //console.log(status);
                                     //console.log(data);
                                 } else {
                                     //console.log(data);
+                                    RED.notify("Logged in","success");
                                     updateFuturehomeDisplayName(data.firstname);
                                 }
                             });
-                        }
+                        } 
+                    })
+                    .error(function() {
+                        RED.notify("Wrong password or username","error");
                     });
                 }
             });

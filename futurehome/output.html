@@ -127,6 +127,7 @@
                 var url = 'input/devices?id='+user_id;
                 $.get(url, function(data,status) {
                     if (status == "success") {
+                        RED.notify("Recived a list of devices.","success");
                         //console.log("Devices recived: ");
                         //console.log(data);
                         $('#node-input-device').replaceWith('<select id="node-input-device" style="width: 60%;"></select>');
@@ -136,8 +137,13 @@
                             $('#node-input-device').append('<option value="' + device.id + '">' + device.name + '</option>');
                         });
                     }
+                })
+                .error(function(jqXHR, textStatus, errorThrown) {
+                    //console.log(jqXHR);
+                    RED.notify(jqXHR.responseText, "error");
+                    //console.log(textStatus);
+                    //console.log(errorThrown);
                 });
-
             });            
 
         },
@@ -160,7 +166,7 @@
         <input type="text" id="node-input-user">
     </div>
      <div class="form-row">
-        <label for="node-input-shortcut"> Device</label>
+        <label for="node-input-shortcut"> Shortcut</label>
         <input type="text" id="node-input-shortcut" style="width: 60%;" />
         <a id="node-input-shortcut-scan" class="btn"><i class="fa fa-search"></i></a>
     </div>
@@ -220,6 +226,7 @@
                 var url = 'output/shortcuts?id='+user_id;
                 $.get(url, function(data,status) {
                     if (status == "success") {
+                        RED.notify("Recived a list of shortcuts.","success");
                         //console.log("Shortcuts recived: ");
                         //console.log(data);
                         $('#node-input-shortcut').replaceWith('<select id="node-input-shortcut" style="width: 60%;"></select>');
@@ -229,6 +236,12 @@
                             $('#node-input-shortcut').append('<option value="' + shortcut.id + '">' + shortcut.name + '</option>');
                         });
                     }
+                })
+                .error(function(jqXHR, textStatus, errorThrown) {
+                    //console.log(jqXHR);
+                    RED.notify(jqXHR.responseText, "error");
+                    //console.log(textStatus);
+                    //console.log(errorThrown);
                 });
             });            
         },

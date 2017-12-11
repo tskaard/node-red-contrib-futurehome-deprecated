@@ -211,11 +211,17 @@ module.exports = function(RED) {
 
     RED.httpAdmin.get('/output/shortcuts', function(req, res){
         if (!req.query.id) {
-            res.sendStatus(400);
+            res.status(400);
+            res.send("No node-id");
             return;
         }
         var node_id = req.query.id;
         var credentials = RED.nodes.getCredentials(node_id);
+        if (!credentials) {
+            res.status(400);
+            res.send("Missing site information. Press Done, and try again.");
+            return;
+        }
 
         request.get({
             url: "https://" + credentials.base_uri + "api/v2/sites/" + credentials.site_id + "/shortcuts",
@@ -230,11 +236,14 @@ module.exports = function(RED) {
             }
             if (data.error) {
                 console.log("oauth error: " + data.error);
+                res.status(400);
+                res.send(data.error);
                 return;
             }
             if (!data.shortcuts) {
                 console.log("No shortcuts!");
-                res.sendStatus(400);
+                res.status(400);
+                res.send("No shortcuts!");
             } else {
                 //console.log("Sending list of shortcuts: ")
                 //console.log(data.shortcuts);

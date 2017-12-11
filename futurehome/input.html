@@ -106,6 +106,7 @@
                 var url = 'input/devices?id='+user_id;
                 $.get(url, function(data,status) {
                     if (status == "success") {
+                        RED.notify("Got a list of devices.","success");
                         //console.log("Devices recived: ");
                         //console.log(data);
                         $('#node-input-device').replaceWith('<select id="node-input-device" style="width: 60%;"></select>');
@@ -115,6 +116,12 @@
                             $('#node-input-device').append('<option value="' + device.id + '">' + device.name + '</option>');
                         });
                     }
+                })
+                .error(function(jqXHR, textStatus, errorThrown) {
+                    //console.log(jqXHR);
+                    RED.notify(jqXHR.responseText, "error");
+                    //console.log(textStatus);
+                    //console.log(errorThrown);
                 });
 
             });
