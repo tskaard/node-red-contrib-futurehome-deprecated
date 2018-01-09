@@ -155,7 +155,7 @@ module.exports = function(RED) {
             }
             if (data.error) {
                 console.log("oauth error: " + data.error);
-                res.sendStatus(400);
+                res.sendStatus(401);
                 return;
             }
             //console.log(data);

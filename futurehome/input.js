@@ -196,7 +196,6 @@ module.exports = function(RED) {
         }
         var node_id = req.query.id;
         var credentials = RED.nodes.getCredentials(node_id);
-        console.log(credentials);
         if (!credentials) {
             res.status(400);
             res.send("Missing site information. Press Done, and try again.");
