@@ -16,7 +16,7 @@ module.exports = function(RED) {
         try {
             node.fh_user = RED.nodes.getNode(n.user);  
         } catch (err) {
-            console.log("Error: " + err);
+            node.error("Error, no login node: " + err);
         }
 
         if (!node.fh_user || !node.fh_user.credentials.access_token || !node.fh_user.credentials.site_id) {
@@ -50,7 +50,6 @@ module.exports = function(RED) {
                 }
             });
             socket.on('message',function(data,flags) {
-                //console.log(data);
                 node.send({payload: data});
                 clearTimeout(node.ping);
                 node.ping = setTimeout(function() {sendPing(node.fhws)}, 9000);
@@ -109,7 +108,7 @@ module.exports = function(RED) {
         try {
             node.fh_user = RED.nodes.getNode(n.user);  
         } catch (err) {
-            console.log("Error: " + err);
+            node.error("Error, no login node: " + err);
         }
            
         
@@ -144,7 +143,6 @@ module.exports = function(RED) {
                 }
             });
             socket.on('message',function(data,flags) {
-                //console.log(data);
                 node.send({payload: data});
                 clearTimeout(node.ping);
                 node.ping = setTimeout(function() {sendPing(node.fhws)}, 9000);
@@ -210,19 +208,19 @@ module.exports = function(RED) {
             },
         }, function(err, result, data) {
             if (err) {
-                console.log("request error:" + err);
+                node.error("Problem getting devices: " + JSON.stringify(err));
                 return;
             }
             if (data.error) {
-                console.log("oauth error: " + data.error);
+                node.log(JSON.stringify(data.error));
                 res.status(400);
                 res.send(data.error);
                 return;
             }
             if (!data._embedded) {
-                console.log("No devices!");
+                node.log("Missing devices in response.");
                 res.status(400);
-                res.send("No devices.");
+                res.send("Missing devices in response.");
             } else {
                 //console.log("Sending devices: ")
                 //console.log(data._embedded);

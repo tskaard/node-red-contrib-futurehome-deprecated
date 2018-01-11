@@ -13,7 +13,7 @@ module.exports = function(RED) {
         try {
         	node.fh_user = RED.nodes.getNode(n.user);  
        	} catch (err) {
-            console.log("Error: " + err);
+            node.error("Error, no login node: " + err);
        	}
            
         if (!node.fh_user || !node.fh_user.credentials.access_token || !node.fh_user.credentials.site_id) {
@@ -26,7 +26,7 @@ module.exports = function(RED) {
        		try {
        			var payload = msg.payload//JSON.parse(msg.payload)
       		} catch (err) {
-      			console.log("ERROR: "+err)
+      			node.log("Error, no payload: "+err)
       			return
       		}
 
@@ -54,7 +54,7 @@ module.exports = function(RED) {
     		form: { mode: modeType },
 		}, function(err, result, body) {
     		if (err) {
-        		console.log("request error:" + err);
+        		node.log("Problem setting " + modeType + " mode: " + JSON.stringify(err));
          		return;
     		}
     		//console.log("Mode changed! "+body);
@@ -73,7 +73,7 @@ module.exports = function(RED) {
         try {
         	node.fh_user = RED.nodes.getNode(n.user);  
        	} catch (err) {
-            console.log("Error: " + err);
+            node.error("Error, no login node: " + err);
        	}
            
         if (!node.fh_user || !node.fh_user.credentials.access_token || !node.fh_user.credentials.site_id || !node.device_id) {
@@ -94,7 +94,7 @@ module.exports = function(RED) {
 					patchDevice(node.fh_user, node.device_id, msg.payload);
 				} else {
 					// TODO: error msg
-					console.log("int out of range");
+					node.log("int out of range");
 				}
 			} else if (typeof msg.payload === 'string') {
 				// payload is a string
@@ -112,11 +112,11 @@ module.exports = function(RED) {
 						break;
 					default:
 						// TODO: error msg
-						console.log("wrong string!");
+						node.log("wrong string!");
 				}
 			} else {
 				// TODO: error msg
-				console.log("wrong input val");
+				node.log("wrong input val");
 			}
       		
        	});
@@ -134,7 +134,7 @@ module.exports = function(RED) {
     		form: state,
 		}, function(err, result, body) {
     		if (err) {
-        		console.log("request error:" + err);
+        		node.log("Problem setting " + JSON.stringify(state) + " : " + JSON.stringify(err));
          		return;
     		}
     		// TODO: feedback that command is sent
@@ -154,7 +154,7 @@ module.exports = function(RED) {
         try {
         	node.fh_user = RED.nodes.getNode(n.user);  
        	} catch (err) {
-            console.log("Error: " + err);
+            node.error("Error, no login node: " + err);
        	}
            
         if (!node.fh_user || !node.fh_user.credentials.access_token || !node.fh_user.credentials.site_id || !node.shortcut_id) {
@@ -200,7 +200,7 @@ module.exports = function(RED) {
     		form: { shortcut: shortcut_id },
 		}, function(err, result, body) {
     		if (err) {
-        		console.log("request error:" + err);
+        		node.log("Problem setting shortcut id: " + shortcut_id + " : " + JSON.stringify(err));
          		return;
     		}
     		// TODO: notifi that shortcut was run
@@ -231,17 +231,17 @@ module.exports = function(RED) {
             },
         }, function(err, result, data) {
             if (err) {
-                console.log("request error:" + err);
+                node.log("Problem getting shortcuts: " + JSON.stringify(err));
                 return;
             }
             if (data.error) {
-                console.log("oauth error: " + data.error);
+                node.log(JSON.stringify(data.error));
                 res.status(400);
                 res.send(data.error);
                 return;
             }
             if (!data.shortcuts) {
-                console.log("No shortcuts!");
+                node.log("Missing shortcuts in response.");
                 res.status(400);
                 res.send("No shortcuts!");
             } else {

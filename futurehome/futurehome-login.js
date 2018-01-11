@@ -12,7 +12,7 @@ module.exports = function(RED) {
         var node = this;
 
         node.getRefreshToken(function(err){
-            console.log("Error");
+            node.log("Problem with getting refresh token: " + err)
         });
     }
 
@@ -35,7 +35,7 @@ module.exports = function(RED) {
         var credentials = this.credentials;
         var node = this;
         if (!credentials.refresh_token) {
-            node.error("No refreshtoken!");
+            node.error("No refresh token to use for new token!");
             return;
         }
         if (credentials.expire_time < (Date.now() / 1000) +3700){
@@ -53,11 +53,11 @@ module.exports = function(RED) {
                 },
             }, function(err, result, data) {
                 if (err) {
-                    console.log("request error:" + err);
+                    node.log("Problem requesting refresh token: " + JSON.stringify(err));
                     return;
                 }
                 if (data.error) {
-                    console.log("oauth error: " + data.error);
+                    node.log(JSON.stringify(data.error));
                     return;
                 }
             credentials.access_token = data.access_token;
@@ -65,10 +65,10 @@ module.exports = function(RED) {
             credentials.expires_in = data.expires_in;
             credentials.expire_time = (Date.now() / 1000) + data.expires_in;
             RED.nodes.addCredentials(node.id, credentials);
-            //console.log("Updated credentials!");
+            node.log("Updated token and refresh token!");
             });
         } else {
-            //console.log("Refresh token is NOT about to expire!!");
+            node.log("Do not need a new refresh token!");
             return;
         }
     };
@@ -103,15 +103,15 @@ module.exports = function(RED) {
             },
         }, function(err, result, data) {
             if (err) {
-                console.log("request error:" + err);
+                node.log("Problem getting sites: " + JSON.stringify(err));
                 return;
             }
             if (data.error) {
-                console.log("oauth error: " + data.error);
+                node.log(JSON.stringify(data.error));
                 return;
             }
             if (!data._embedded.sites) {
-                console.log("No sites!");
+                node.log("Missing site in response.");
                 res.send(data);
             } else {
                 //console.log("Sending sites: ")
@@ -149,12 +149,12 @@ module.exports = function(RED) {
             },
         }, function(err, result, data) {
             if (err) {
-                console.log("request error:" + err);
+                node.log("Problem authenticating: " + JSON.stringify(err));
                 res.sendStatus(400);
                 return;
             }
             if (data.error) {
-                console.log("oauth error: " + data.error);
+                node.log(JSON.stringify(data.error));
                 res.sendStatus(401);
                 return;
             }
@@ -165,6 +165,7 @@ module.exports = function(RED) {
             credentials.expire_time = (Date.now() / 1000) + data.expires_in;
             credentials.base_uri = req.query.base_uri;
             RED.nodes.addCredentials(node_id, credentials);
+            node.log("Received auth token.");
             res.send(data);
 
         });
@@ -187,11 +188,11 @@ module.exports = function(RED) {
             form: {},
         }, function(err, result, data) {
             if (err) {
-                console.log("request error:" + err);
+                node.log("Problem getting user information: " + JSON.stringify(err));
                 return;
             }
             if (data.error) {
-                console.log("oauth error: " + data.error);
+                node.log(JSON.stringify(data.error));
                 return;
             }
             var dataDecode = decodeURIComponent(data);
