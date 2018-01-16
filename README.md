@@ -47,13 +47,13 @@ This node is used to change the state of a device. Dim or turn on/off a light.
 ```javascript
 // Send the following payload to use the node.
 // Turn device ON or OFF:
-msg.payload = "on";						// turn on a device
-msg.payload = "off"; 					// turn off a device
-msg.payload = {"power":"on"};			// turn on a device
-msg.payload = {"power":"off"};			// turn off a device
+msg.payload = "on";					// turn on a device
+msg.payload = "off";				// turn off a device
+msg.payload = {"power":"on"};		// turn on a device
+msg.payload = {"power":"off"};	// turn off a device
 // Dim a device to %:
-msg.payload = 35;						// dim a device to 35%
-msg.payload = {"dimValue":"75"};		// dim a device to 75%
+msg.payload = 35;					// dim a device to 35%
+msg.payload = {"dimValue":"75"};	// dim a device to 75%
 ```
 
 

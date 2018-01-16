@@ -20,7 +20,14 @@
 </script>
 
 <script type="text/x-red" data-help-name="mode">
-    <p>Select the mode to change to or input a JSON msg: { mode: 'home' } to change mode to home mode.</p>
+    <p>This node can be used to change modes on a Futurehome site (smarthub).</p>
+    <p>Send one of the following payload to change the mode:</p>
+    <p>
+        <code>msg.payload = {"mode":"home"};</code>
+        <code>msg.payload = {"mode":"away"};</code>
+        <code>msg.payload = {"mode":"sleep"};</code>
+        <code>msg.payload = {"mode":"vacation"};</code>
+    </p>
     <p>If input is something else (like timestamp) the mode on the node will be set.</p>
 </script>
 
@@ -78,10 +85,21 @@
 </script>
 
 <script type="text/x-red" data-help-name="change-device">
-    <p>Select the device to change.</p>
-    <p>Input must be a JSON msg { power: 'on'/'off' }, { dimValue: '50'} 0..100 allowed.</p>
-    <p>Or a string with the value on or off </p>
-    <p>Or an int with a value between 0-100, only for dimmable devices.</p>
+    <p>This node can be used to change a state of a device.</p>
+    <p>Send the following payload to change the state of a device:</p>
+    </p>
+    <p>Turn device ON or OFF:</p>
+    <p>
+        <code>msg.payload = "on";</code>
+        <code>msg.payload = "off";</code>
+        <code>msg.payload = {"power":"on"};</code>
+        <code>msg.payload = {"power":"off"};</code>
+    </p>
+    <p>Dim a device to %:</p>
+    <p>
+        <code>msg.payload = 35;</code>
+        <code>msg.payload = {"dimValue":"75"};</code>
+    </p>
 </script>
 
 <script type="text/javascript">
@@ -177,7 +195,13 @@
 </script>
 
 <script type="text/x-red" data-help-name="shortcut">
-    <p>Get a list of shortcuts. Select a shortcut to run, or input the shortcut number to run.</p>
+    <p>This node can be used to run a shortcut on a Futurehome site (smarthub).</p>
+    <p>
+        Send the following payload to use the node. If msg.payload is an `int` the node will try to run the shortcut with that ID.
+    </p>
+    <p>
+        <code>msg.payload = 3;  // will run shortcut with ID = 3</code>
+    </p>
     <p>If input is something else (like timestamp) the selected shortcut will run.</p>
 </script>
 

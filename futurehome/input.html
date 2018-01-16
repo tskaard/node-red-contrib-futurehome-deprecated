@@ -10,7 +10,11 @@
 </script>
 
 <script type="text/x-red" data-help-name="site">
-    <p>Node that connects to a Futurehome site using API websocket.</p>
+    <p>
+        This node connects to a Futurehome site (smarthub) using WebSocket.
+        The data received from the WebSocket will be in <code>msg.payload</code>
+        The node uses futurehome-login node to authenticate and selecting site to connect to.
+    </p>
 </script>
 
 <script type="text/javascript">
@@ -60,7 +64,11 @@
 </script>
 
 <script type="text/x-red" data-help-name="device">
-    <p>Node that connects to a Futurehome device using API websocket.</p>
+    <p>
+        This node connects to a Futurehome device (lights, sensors etc.) using WebSocket.
+        The data received from the WebSocket will be in <code>msg.payload</code>
+        The node uses futurehome-login node to authenticate and selecting site to connect to.
+    </p>
 </script>
 
 <script type="text/javascript">
