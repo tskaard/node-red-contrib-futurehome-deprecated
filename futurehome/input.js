@@ -208,17 +208,17 @@ module.exports = function(RED) {
             },
         }, function(err, result, data) {
             if (err) {
-                node.error("Problem getting devices: " + JSON.stringify(err));
+                console.error("Problem getting devices: " + JSON.stringify(err));
                 return;
             }
             if (data.error) {
-                node.log(JSON.stringify(data.error));
+                console.log(JSON.stringify(data.error));
                 res.status(400);
                 res.send(data.error);
                 return;
             }
             if (!data._embedded) {
-                node.log("Missing devices in response.");
+                console.log("Missing devices in response.");
                 res.status(400);
                 res.send("Missing devices in response.");
             } else {

@@ -103,15 +103,15 @@ module.exports = function(RED) {
             },
         }, function(err, result, data) {
             if (err) {
-                node.log("Problem getting sites: " + JSON.stringify(err));
+                console.log("Problem getting sites: " + JSON.stringify(err));
                 return;
             }
             if (data.error) {
-                node.log(JSON.stringify(data.error));
+                console.log(JSON.stringify(data.error));
                 return;
             }
             if (!data._embedded.sites) {
-                node.log("Missing site in response.");
+                console.log("Missing site in response.");
                 res.send(data);
             } else {
                 //console.log("Sending sites: ")
@@ -149,12 +149,12 @@ module.exports = function(RED) {
             },
         }, function(err, result, data) {
             if (err) {
-                node.log("Problem authenticating: " + JSON.stringify(err));
+                console.log("Problem authenticating: " + JSON.stringify(err));
                 res.sendStatus(400);
                 return;
             }
             if (data.error) {
-                node.log(JSON.stringify(data.error));
+                console.log(JSON.stringify(data.error));
                 res.sendStatus(401);
                 return;
             }
@@ -165,7 +165,7 @@ module.exports = function(RED) {
             credentials.expire_time = (Date.now() / 1000) + data.expires_in;
             credentials.base_uri = req.query.base_uri;
             RED.nodes.addCredentials(node_id, credentials);
-            node.log("Received auth token.");
+            console.log("Received auth token.");
             res.send(data);
 
         });
@@ -188,11 +188,11 @@ module.exports = function(RED) {
             form: {},
         }, function(err, result, data) {
             if (err) {
-                node.log("Problem getting user information: " + JSON.stringify(err));
+                console.log("Problem getting user information: " + JSON.stringify(err));
                 return;
             }
             if (data.error) {
-                node.log(JSON.stringify(data.error));
+                console.log(JSON.stringify(data.error));
                 return;
             }
             var dataDecode = decodeURIComponent(data);

@@ -54,7 +54,7 @@ module.exports = function(RED) {
     		form: { mode: modeType },
 		}, function(err, result, body) {
     		if (err) {
-        		node.log("Problem setting " + modeType + " mode: " + JSON.stringify(err));
+        		console.log("Problem setting " + modeType + " mode: " + JSON.stringify(err));
          		return;
     		}
     		//console.log("Mode changed! "+body);
@@ -134,7 +134,7 @@ module.exports = function(RED) {
     		form: state,
 		}, function(err, result, body) {
     		if (err) {
-        		node.log("Problem setting " + JSON.stringify(state) + " : " + JSON.stringify(err));
+        		console.log("Problem setting " + JSON.stringify(state) + " : " + JSON.stringify(err));
          		return;
     		}
     		// TODO: feedback that command is sent
@@ -200,7 +200,7 @@ module.exports = function(RED) {
     		form: { shortcut: shortcut_id },
 		}, function(err, result, body) {
     		if (err) {
-        		node.log("Problem setting shortcut id: " + shortcut_id + " : " + JSON.stringify(err));
+        		console.log("Problem setting shortcut id: " + shortcut_id + " : " + JSON.stringify(err));
          		return;
     		}
     		// TODO: notifi that shortcut was run
@@ -231,17 +231,17 @@ module.exports = function(RED) {
             },
         }, function(err, result, data) {
             if (err) {
-                node.log("Problem getting shortcuts: " + JSON.stringify(err));
+                console.log("Problem getting shortcuts: " + JSON.stringify(err));
                 return;
             }
             if (data.error) {
-                node.log(JSON.stringify(data.error));
+                console.log(JSON.stringify(data.error));
                 res.status(400);
                 res.send(data.error);
                 return;
             }
             if (!data.shortcuts) {
-                node.log("Missing shortcuts in response.");
+                console.log("Missing shortcuts in response.");
                 res.status(400);
                 res.send("No shortcuts!");
             } else {

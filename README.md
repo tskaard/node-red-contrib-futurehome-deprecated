@@ -24,7 +24,7 @@ This node is used to connect to a Futurehome site, and output the data comming f
 
 
 ### connect to device
-	There is currently a problem with the Futurehome API, so this node will not recive any data.
+	There is currently a problem with the Futurehome API, so this node will not receive any data.
 This node is used to connect to a device in the Futurehome system, and output changes from the device. This can be a magnet contact reporting open/close state, a motion sensor reporting motion, or a light turing on/off.
 
 
@@ -47,12 +47,12 @@ This node is used to change the state of a device. Dim or turn on/off a light.
 ```javascript
 // Send the following payload to use the node.
 // Turn device ON or OFF:
-msg.payload = "on";					// turn on a device
-msg.payload = "off";				// turn off a device
+msg.payload = "on";			// turn on a device
+msg.payload = "off";		// turn off a device
 msg.payload = {"power":"on"};		// turn on a device
 msg.payload = {"power":"off"};	// turn off a device
 // Dim a device to %:
-msg.payload = 35;					// dim a device to 35%
+msg.payload = 35;		// dim a device to 35%
 msg.payload = {"dimValue":"75"};	// dim a device to 75%
 ```
 
@@ -64,7 +64,7 @@ This node is used to run a shortcut in the system.
 ```javascript
 // Send the following payload to use the node.
 // If msg.payload is an int the node will try to run the shortcut with that ID.
-msg.payload = 3;				// will run shortcut with ID = 3
+msg.payload = 3;		// will run shortcut with ID = 3
 
 // Anything else will run the shortcut selected on the node.
 ```
