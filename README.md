@@ -68,3 +68,17 @@ msg.payload = 3;		// will run shortcut with ID = 3
 
 // Anything else will run the shortcut selected on the node.
 ```
+
+### get state
+This node is used to get the state of a device or a room.
+
+```javascript
+// Send the following payload to use the node.
+// Get the information from room 3:
+msg.payload = {"type":"rooms","id":"3"};
+
+// Get the information from device 2 
+msg.payload = {"type":"devices","id":"2"};
+
+// If input is something else (like timestamp) the node will get information from the selected room or device.
+```

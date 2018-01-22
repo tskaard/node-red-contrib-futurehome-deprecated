@@ -281,3 +281,182 @@
     });
 </script>
 
+
+<script type="text/x-red" data-template-name="get-state">
+     <div class="form-row">
+        <label for="node-input-user"> Futurehome site</label>
+        <input type="text" id="node-input-user">
+    </div>
+    <div class="form-row">
+        <label for="node-input-get_type"> Select type</label>
+        <select id="node-input-get_type">
+            <option value=""> -- select a type -- </option>
+            <option value="rooms">Room</option>
+            <option value="devices">Device</option>
+        </select>
+    </div>
+     <div class="form-row">
+        <label for="node-input-device"> Device</label>
+        <input type="text" id="node-input-device" style="width: 60%;" />
+        <a id="node-input-device-scan" class="btn"><i class="fa fa-search"></i></a>
+    </div>
+     <div class="form-row">
+        <label for="node-input-room"> Room</label>
+        <input type="text" id="node-input-room" style="width: 60%;" />
+        <a id="node-input-room-scan" class="btn"><i class="fa fa-search"></i></a>
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="get-state">
+    <p>This node can be used to get the current state of a device or a room.</p>
+    <p>
+        Send the following payload to use the node.
+    </p>
+    <p>
+        <code>msg.payload = {"type":"rooms","id":"3"};  // will get the information from room 3</code>
+        <code>msg.payload = {"type":"devices","id":"2"};  // will get the information from device 2</code>
+    </p>
+    <p>
+        If input is something else (like timestamp) the node will get information from the selected room or device.
+    </p>
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('get-state',{
+        category: 'futurehome',
+        color: '#EF4C57',
+        defaults: {
+            user: {type:"futurehome-login",required:true},
+            name: {value:""},
+            get_type: {value:""},
+            device_id: {value:""},
+            device: {value:""},
+            room_id: {value:""},
+            room: {value:""}
+        },
+        inputs:1,
+        outputs:1,
+        icon: "device.png",
+        align: 'right',
+        paletteLabel: function() {
+            return "get state";
+        },
+        label: function() {
+            return this.name||"get state";
+        },
+        oneditprepare: function() {
+            var user_id = this.user;
+
+            if ($('#node-input-get_type option:selected').val() != "rooms" || "devices") {
+                $('#node-input-device').prop("readonly",true);
+                $('#node-input-device-scan').attr("disabled", true);
+                $('#node-input-room').prop("readonly",true);
+                $('#node-input-room-scan').attr("disabled", true);
+            }
+
+            if (!user_id) {
+                //console.log("No user!");
+                $('#node-input-get_type').prop("readonly",true);
+                $('#node-input-get_type').attr("disabled", true);                
+            } else {
+                //console.log("have user");
+                $('#node-input-get_type').prop("readonly",false);
+                $('#node-input-get_type').attr("disabled",false);
+
+            }
+
+            function changeType() {
+                console.log($('#node-input-get_type option:selected').val());
+
+                if ($('#node-input-get_type option:selected').val() == "devices") {
+                    $('#node-input-device').prop("readonly",false);
+                    $('#node-input-device-scan').attr("disabled",false);
+
+                    $('#node-input-room').prop("readonly",true);
+                    $('#node-input-room-scan').attr("disabled", true);
+
+                } else if ($('#node-input-get_type option:selected').val() == "rooms") {
+                    $('#node-input-device').prop("readonly",true);
+                    $('#node-input-device-scan').attr("disabled", true);
+
+                    $('#node-input-room').prop("readonly",false);
+                    $('#node-input-room-scan').attr("disabled",false);
+                }
+                //$("#node-input-name").val($('#node-input-mode option:selected').text() + " mode");
+            }
+            $('#node-input-get_type').on('change', changeType)
+
+            function changeDevice() {
+                this.device = $('#node-input-device option:selected').text();
+                //$("#node-input-name").val($('#node-input-device option:selected').text());
+                this.device_id = $('#node-input-device option:selected').val();
+            }            
+
+            function changeRoom() {
+                this.room = $('#node-input-room option:selected').text();
+                //$("#node-input-name").val($('#node-input-device option:selected').text());
+                this.room_id = $('#node-input-room option:selected').val();
+            }   
+
+            $("#node-input-device-scan").click(function(e) {
+                var url = 'input/devices?id='+user_id;
+                $.get(url, function(data,status) {
+                    if (status == "success") {
+                        RED.notify("Recived a list of devices.","success");
+                        //console.log("Devices recived: ");
+                        //console.log(data);
+                        $('#node-input-device').replaceWith('<select id="node-input-device" style="width: 60%;"></select>');
+                        $('#node-input-device').on('change', changeDevice)
+                        data.forEach(function(device){
+                            //console.log(device.name + device.id);
+                            $('#node-input-device').append('<option value="' + device.id + '">' + device.name + '</option>');
+                        });
+                    }
+                })
+                .error(function(jqXHR, textStatus, errorThrown) {
+                    RED.notify(jqXHR.responseText, "error");
+                });
+            });
+
+            $("#node-input-room-scan").click(function(e) {
+                var url = 'output/rooms?id='+user_id;
+                $.get(url, function(data,status) {
+                    if (status == "success") {
+                        RED.notify("Recived a list of rooms.","success");
+                        //console.log("Devices recived: ");
+                        //console.log(data);
+                        $('#node-input-room').replaceWith('<select id="node-input-room" style="width: 60%;"></select>');
+                        $('#node-input-room').on('change', changeRoom)
+                        data.forEach(function(room){
+                            //console.log(room.name + room.id);
+                            $('#node-input-room').append('<option value="' + room.id + '">' + room.name + '</option>');
+                        });
+                    }
+                })
+                .error(function(jqXHR, textStatus, errorThrown) {
+                    RED.notify(jqXHR.responseText, "error");
+                });
+            });             
+
+        },
+        oneditsave: function() {
+            this.device = $('#node-input-device option:selected').text();
+            //$("#node-input-name").val($('#node-input-device option:selected').text());
+            this.device_id = $('#node-input-device option:selected').val();
+            this.room = $('#node-input-room option:selected').text();
+            this.room_id = $('#node-input-room option:selected').val();
+        },
+        oneditcancel: function() {
+        }
+    });
+</script>
+
+
+
+
+
+

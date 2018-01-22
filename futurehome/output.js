@@ -189,7 +189,6 @@ module.exports = function(RED) {
 	RED.nodes.registerType("shortcut",Shortcut); 
 
 
-
 	function runShortcut(fh_user, shortcut_id) {
 		request.patch({
     		url: "https://" + fh_user.credentials.base_uri +"api/v2/sites/" + fh_user.credentials.site_id,
@@ -252,6 +251,125 @@ module.exports = function(RED) {
 
         });
     });
+    
+
+    function GetState(n) {
+        RED.nodes.createNode(this,n);
+        var node = this;
+        node.get_type = n.get_type;
+        node.device_id = n.device_id;
+        node.room_id = n.room_id;
+        node.fh_user;
+
+        try {
+            node.fh_user = RED.nodes.getNode(n.user);  
+        } catch (err) {
+            node.error("Error, no login node: " + err);
+        }
+         //  if (!node.fh_user || !node.fh_user.credentials.access_token || !node.fh_user.credentials.site_id || !node.device_id)
+        if (!node.fh_user || !node.fh_user.credentials.access_token || !node.fh_user.credentials.site_id) {
+            this.warn("No access token!!");
+            return;
+        }
+        
+        // TODO: use string as input instead of json
+        this.on('input', function (msg) {
+            if (msg.payload.hasOwnProperty("type") && msg.payload.hasOwnProperty("id")) {
+                if (typeof msg.payload.type === 'string' && typeof msg.payload.id === 'string') {
+                    getState(msg.payload.type, msg.payload.id);
+                } else {
+                    node.warn("Input is not typeof 'string'");
+                }
+            }  else {
+                if (node.get_type == "devices") {
+                    if (node.device_id) {
+                        getState(node.get_type, node.device_id);
+                    } else {
+                        node.warn("node is missing device id");
+                    }
+                } else if (node.get_type == "rooms") {
+                    if (node.room_id) {
+                        getState(node.get_type, node.room_id);
+                    } else {
+                        node.warn("node is missing room id");
+                    }
+                } else {
+                    node.warn("type is not set");
+                }
+            }  
+        });
+        
+        // type has to be: "rooms" or "devices"
+        function getState(type, id) {
+            request.get({
+            url: "https://" + node.fh_user.credentials.base_uri + "api/v2/sites/" + node.fh_user.credentials.site_id + "/" + type + "/" + id,
+            json: true,
+            headers: {
+                "Authorization": "Bearer " + node.fh_user.credentials.access_token
+            },
+            }, function(err, result, data) {
+                if (err) {
+                    console.log("Problem getting shortcuts: " + JSON.stringify(err));
+                    return;
+                }
+                if (data.error) {
+                    node.log(JSON.stringify(data.error));
+                    return;
+                } else {
+                    //console.log("Sending recived data: ")
+                    //console.log(data);
+                    node.send({payload: data});
+                    //res.send(data.shortcuts);
+                }
+            });
+        }
+    }
+    RED.nodes.registerType("get-state",GetState);
 
 
+    RED.httpAdmin.get('/output/rooms', function(req, res){
+        if (!req.query.id) {
+            res.status(400);
+            res.send("No node-id");
+            return;
+        }
+        var node_id = req.query.id;
+        var credentials = RED.nodes.getCredentials(node_id);
+        if (!credentials) {
+            res.status(400);
+            res.send("Missing site information. Press Done, and try again.");
+            return;
+        }
+
+        request.get({
+            url: "https://" + credentials.base_uri + "api/v2/sites/" + credentials.site_id + "/rooms", // + "/rooms"
+            json: true,
+            headers: {
+                "Authorization": "Bearer " + credentials.access_token
+            },
+        }, function(err, result, data) {
+            if (err) {
+                console.error("Problem getting rooms: " + JSON.stringify(err));
+                return;
+            }
+            if (data.error) {
+                console.log(JSON.stringify(data.error));
+                res.status(400);
+                res.send(data.error);
+                return;
+            }
+            if (!data) {
+                console.log("Missing rooms in response.");
+                res.status(400);
+                res.send("Missing rooms in response.");
+            } else {
+                //console.log("Sending devices: ")
+                //console.log(data._embedded);
+                res.send(data);
+            }
+
+        });
+    });
+
+    
 }
