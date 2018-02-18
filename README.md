@@ -55,6 +55,18 @@ msg.payload = 35;		// dim a device to 35%
 msg.payload = {"dimValue":"75"};	// dim a device to 75%
 ```
 
+### set temperature
+This node is used to change the temperature setpoint in a room.
+Room ID is selected on the node.
+
+```javascript
+// Send the following payload to use the node.
+// Set the temperature::
+msg.payload = 15;
+msg.payload = 16.5;
+msg.payload = {"temperature":"22.0"}; // Has to be float, "22" won't work.
+msg.payload = {"temperature":"19.5"};
+```
 
 ### run shortcut
 
