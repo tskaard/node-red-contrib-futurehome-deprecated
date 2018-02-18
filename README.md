@@ -19,15 +19,15 @@ There are a total of 5 nodes. Two used for connecting to the system using websoc
 ![](static/nodes.png "Nodes")
 
 
-### connect to site
+### site (connect to site)
 This node is used to connect to a Futurehome site, and output the data comming from the site. The data can be anything from a device changing state, a mode change, or the temperature setpoint in a room.
 
 
-### connect to device
+### device (connect to device)
 This node is used to connect to a device in the Futurehome system, and output changes from the device. This can be a magnet contact reporting open/close state, a motion sensor reporting motion, or a light turing on/off.
 
 
-### change mode
+### mode
 This node is used to change between the 4 modes in Futurehome.
 The mode can be defined on the node, or overwritten by payload.
 
@@ -40,7 +40,7 @@ msg.payload = {"mode":"vacation"};	// changes to vacation mode
 ```
 
 
-### change a device
+### change-device
 This node is used to change the state of a device. Dim or turn on/off a light.
 
 ```javascript
@@ -55,12 +55,13 @@ msg.payload = 35;		// dim a device to 35%
 msg.payload = {"dimValue":"75"};	// dim a device to 75%
 ```
 
-### set temperature
+### change-room (set temperature)
 This node is used to change the temperature setpoint in a room.
 Room ID is selected on the node.
 
 ```javascript
 // Send the following payload to use the node.
+// Temperatur has to be between 5.0 and 50.0 degrees.
 // Set the temperature::
 msg.payload = 15;
 msg.payload = 16.5;
@@ -68,7 +69,7 @@ msg.payload = {"temperature":"22.0"}; // Has to be float, "22" won't work.
 msg.payload = {"temperature":"19.5"};
 ```
 
-### run shortcut
+### shortcut
 
 This node is used to run a shortcut in the system.
 
@@ -80,7 +81,7 @@ msg.payload = 3;		// will run shortcut with ID = 3
 // Anything else will run the shortcut selected on the node.
 ```
 
-### get state
+### get-state
 This node is used to get the state of a device or a room.
 
 ```javascript
