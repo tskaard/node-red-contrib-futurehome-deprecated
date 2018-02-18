@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-futurehome",
-  "version": "2.0.0",
+  "version": "1.2.0",
   "description": "Futurehome nodes for node-red",
   "author": "Tor Erik Skårdal <skardal@me.com>",
   "license": "MIT",
