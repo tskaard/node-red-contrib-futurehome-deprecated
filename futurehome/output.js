@@ -144,6 +144,75 @@ module.exports = function(RED) {
     };
 
 
+    function ChangeRoom(n) {
+        RED.nodes.createNode(this,n);
+        
+        var node = this;
+        node.room_id = n.room_id;
+        node.fh_user;
+
+        try {
+            node.fh_user = RED.nodes.getNode(n.user);  
+        } catch (err) {
+            node.error("Error, no login node: " + err);
+        }
+           
+        if (!node.fh_user || !node.fh_user.credentials.access_token || !node.fh_user.credentials.site_id || !node.room_id) {
+            this.warn("No access token, or site, or room_id!!");
+            return;
+        }
+
+        this.on('input', function (msg) {
+            if (msg.payload.hasOwnProperty("temperature")) {
+                patchRoom(node.fh_user, node.room_id, msg.payload);
+            } else if (msg.payload === parseInt(msg.payload, 10)) {
+                if (msg.payload >= 5 && msg.payload <= 50) {
+                    var value = parseFloat(msg.payload).toFixed(1);
+                    msg.payload = {"temperature": value};
+                    patchRoom(node.fh_user, node.room_id, msg.payload);
+                } else {
+                    // TODO: error msg
+                    node.log("int/float out of range");
+                }
+            } else if (msg.payload === parseFloat(msg.payload)) {
+                if (msg.payload >= 5.0 && msg.payload <= 50.0) {
+                    var value = msg.payload.toFixed(1);
+                    msg.payload = {"temperature": value};
+                    patchRoom(node.fh_user, node.room_id, msg.payload);
+                }else {
+                    // TODO: error msg
+                    node.log("int/float out of range");
+                }
+            } else {
+                // TODO: error msg
+                node.log("wrong input val");
+            }
+            
+        });
+    }
+    RED.nodes.registerType("change-room",ChangeRoom);
+
+
+    // State : {temperature: 5..50} {temperature: "19,5"} float
+    function patchRoom(fh_user, room_id, state) {
+        request.patch({
+            url: "https://" + fh_user.credentials.base_uri +"api/v2/sites/" + fh_user.credentials.site_id + "/rooms/" + room_id,
+            json: true,
+            headers: {
+                "Authorization": "Bearer "  + fh_user.credentials.access_token
+            },
+            form: state,
+        }, function(err, result, body) {
+            if (err) {
+                console.log("Problem setting " + JSON.stringify(state) + " : " + JSON.stringify(err));
+                return;
+            }
+            // TODO: feedback that command is sent
+            //console.log("Command sent! "+body);
+        });
+
+    };
+
     function Shortcut(n) {
         RED.nodes.createNode(this,n);
         

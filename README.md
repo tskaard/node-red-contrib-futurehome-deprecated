@@ -24,7 +24,6 @@ This node is used to connect to a Futurehome site, and output the data comming f
 
 
 ### connect to device
-	There is currently a problem with the Futurehome API, so this node will not receive any data.
 This node is used to connect to a device in the Futurehome system, and output changes from the device. This can be a magnet contact reporting open/close state, a motion sensor reporting motion, or a light turing on/off.
 
 

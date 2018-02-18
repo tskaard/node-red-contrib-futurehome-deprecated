@@ -176,6 +176,104 @@
 </script>
 
 
+<script type="text/x-red" data-template-name="change-room">
+     <div class="form-row">
+        <label for="node-input-user"> Futurehome site</label>
+        <input type="text" id="node-input-user">
+    </div>
+     <div class="form-row">
+        <label for="node-input-room"> Room</label>
+        <input type="text" id="node-input-room" style="width: 60%;" />
+        <a id="node-input-room-scan" class="btn"><i class="fa fa-search"></i></a>
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="change-room">
+    <p>This node can be used to change the setpoint temperature for a room.</p>
+    <p>Send the following payload to change the temperature in a room:</p>
+    </p>
+    <p>Set the temperature:</p>
+    <p> 
+        <code>msg.payload = 15;</code>
+        <code>msg.payload = 16.5;</code>
+        <code>msg.payload = {"temperature":"22.0"};</code>
+        <code>msg.payload = {"temperature":"19.5"};</code>
+    </p>
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('change-room',{
+        category: 'futurehome',
+        color: '#EF4C57',
+        defaults: {
+            user: {type:"futurehome-login",required:true},
+            room: {value:"",required:true},
+            room_id: {value:"",required:true},
+            name: {value:""}
+        },
+        inputs:1,
+        outputs:0,
+        icon: "",
+        align: 'right',
+        paletteLabel: function() {
+            return "set temperature";
+        },
+        label: function() {
+            return this.name||"set temperature";
+        },
+        oneditprepare: function() {
+            var user_id = this.user;
+
+            if (!user_id) {
+                //console.log("No user!");
+                $('#node-input-room').prop("readonly",true);
+                $('#node-input-room-scan').attr("disabled", true);
+            } else {
+                //console.log("have user");
+                $('#node-input-room').prop("readonly",false);
+                $('#node-input-room-scan').attr("disabled",false);
+            }
+
+            function changeRoom() {
+                this.room = $('#node-input-room option:selected').text();
+                $("#node-input-name").val($('#node-input-room option:selected').text());
+                this.room_id = $('#node-input-room option:selected').val();
+            }            
+ 
+            $("#node-input-room-scan").click(function(e) {
+                var url = 'output/rooms?id='+user_id;
+                $.get(url, function(data,status) {
+                    if (status == "success") {
+                        RED.notify("Recived a list of rooms.","success");
+                        //console.log("Devices recived: ");
+                        //console.log(data);
+                        $('#node-input-room').replaceWith('<select id="node-input-room" style="width: 60%;"></select>');
+                        $('#node-input-room').on('change', changeRoom)
+                        data.forEach(function(room){
+                            //console.log(room.name + room.id);
+                            $('#node-input-room').append('<option value="' + room.id + '">' + room.name + '</option>');
+                        });
+                    }
+                })
+                .error(function(jqXHR, textStatus, errorThrown) {
+                    RED.notify(jqXHR.responseText, "error");
+                });
+            });               
+
+        },
+        oneditsave: function() {
+            this.room = $('#node-input-room option:selected').text();
+            $("#node-input-name").val($('#node-input-room option:selected').text());
+            this.room_id = $('#node-input-room option:selected').val();
+        },
+        oneditcancel: function() {
+        }
+    });
+</script>
 
 
 <script type="text/x-red" data-template-name="shortcut">
