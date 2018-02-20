@@ -87,7 +87,6 @@
 <script type="text/x-red" data-help-name="change-device">
     <p>This node can be used to change a state of a device.</p>
     <p>Send the following payload to change the state of a device:</p>
-    </p>
     <p>Turn device ON or OFF:</p>
     <p>
         <code>msg.payload = "on";</code>
@@ -99,6 +98,13 @@
     <p>
         <code>msg.payload = 35;</code>
         <code>msg.payload = {"dimValue":"75"};</code>
+    </p>
+    <p>Lock and unlock a door:</p>
+    <p>
+        <code>msg.payload = "locked";</code>
+        <code>msg.payload = "unlocked";</code>
+        <code>msg.payload = {"lockState":"locked"};</code>
+        <code>msg.payload = {"lockState":"unlocked"};</code>
     </p>
 </script>
 

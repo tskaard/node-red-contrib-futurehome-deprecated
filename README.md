@@ -41,7 +41,7 @@ msg.payload = {"mode":"vacation"};	// changes to vacation mode
 
 
 ### change-device
-This node is used to change the state of a device. Dim or turn on/off a light.
+This node is used to change the state of a device. Dim or turn on/off a light, or lock/unlock a door.
 
 ```javascript
 // Send the following payload to use the node.
@@ -53,6 +53,11 @@ msg.payload = {"power":"off"};	// turn off a device
 // Dim a device to %:
 msg.payload = 35;		// dim a device to 35%
 msg.payload = {"dimValue":"75"};	// dim a device to 75%
+// Lock and unlock a door:
+msg.payload = "locked"; 
+msg.payload = "unlocked";
+msg.payload = {"lockState":"locked"};
+msg.payload = {"lockState":"unlocked"};
 ```
 
 ### change-room (set temperature)

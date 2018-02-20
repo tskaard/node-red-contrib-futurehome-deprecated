@@ -87,6 +87,8 @@ module.exports = function(RED) {
 				patchDevice(node.fh_user, node.device_id, msg.payload);
 			} else if (msg.payload.hasOwnProperty("dimValue")) {
 				patchDevice(node.fh_user, node.device_id, msg.payload);
+            } else if (msg.payload.hasOwnProperty("lockState")) {
+                patchDevice(node.fh_user, node.device_id, msg.payload);
 			} else if (msg.payload === parseInt(msg.payload, 10)) {
 				if (msg.payload >= 0 && msg.payload <= 100) {
 					var value = msg.payload.toString();
@@ -110,6 +112,16 @@ module.exports = function(RED) {
 						msg.payload = {"power": value};
 						patchDevice(node.fh_user, node.device_id, msg.payload);
 						break;
+                    case "unlocked":
+                        var value = msg.payload;
+                        msg.payload = {"lockState": value};
+                        patchDevice(node.fh_user, node.device_id, msg.payload);
+                        break;
+                    case "locked":
+                        var value = msg.payload;
+                        msg.payload = {"lockState": value};
+                        patchDevice(node.fh_user, node.device_id, msg.payload);
+                        break;
 					default:
 						// TODO: error msg
 						node.log("wrong string!");
