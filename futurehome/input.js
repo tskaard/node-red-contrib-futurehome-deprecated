@@ -98,8 +98,6 @@ module.exports = function(RED) {
         RED.nodes.createNode(this, n);
 
         var node = this;
-        node.log("Site info");
-
         node.fh_user;
 
         try {
@@ -126,7 +124,6 @@ module.exports = function(RED) {
         });
 
         function getSiteInfo() {
-            node.log("get site info");
             request.get({
                 url: "https://" + node.fh_user.credentials.base_uri + "api/v2/sites/" + node.fh_user.credentials.site_id,
                 json: true,
