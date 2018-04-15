@@ -94,6 +94,60 @@ module.exports = function(RED) {
     }
     RED.nodes.registerType("site",FuturehomeSite);
 
+    function GetFuturehomeSiteInfo(n) {
+        RED.nodes.createNode(this, n);
+
+        var node = this;
+        node.log("Site info");
+
+        node.fh_user;
+
+        try {
+            node.fh_user = RED.nodes.getNode(n.user);
+        } catch (err) {
+            node.error("Error, no login node: " + err);
+        }
+
+        if (!node.fh_user || !node.fh_user.credentials.access_token || !node.fh_user.credentials.site_id) {
+            this.warn("No access token!!");
+            return;
+        }
+
+        // TODO: use string as input instead of json
+        this.on('input', function (msg) {
+            try {
+                var payload = msg.payload//JSON.parse(msg.payload)
+            } catch (err) {
+                node.log("Error, no payload: " + err)
+                return
+            }
+
+            getSiteInfo();
+        });
+
+        function getSiteInfo() {
+            node.log("get site info");
+            request.get({
+                url: "https://" + node.fh_user.credentials.base_uri + "api/v2/sites/" + node.fh_user.credentials.site_id,
+                json: true,
+                headers: {
+                    "Authorization": "Bearer " + node.fh_user.credentials.access_token
+                },
+            }, function (err, result, data) {
+                if (err) {
+                    console.log("Problem getting site info: " + JSON.stringify(err));
+                    return;
+                }
+                if (data.error) {
+                    node.log(JSON.stringify(data.error));
+                    return;
+                } else {
+                    node.send({ payload: data });
+                }
+            });
+        }
+    }
+    RED.nodes.registerType("siteState", GetFuturehomeSiteInfo);
 
     function FuturehomeDevice(n) {
         RED.nodes.createNode(this,n);

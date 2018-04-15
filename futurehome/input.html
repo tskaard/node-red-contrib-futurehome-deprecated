@@ -45,7 +45,49 @@
     });
 </script>
 
+<script type="text/x-red" data-template-name="siteState">
+     <div class="form-row">
+        <label for="node-input-user"> Futurehome site</label>
+        <input type="text" id="node-input-user">
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
 
+<script type="text/x-red" data-help-name="siteState">
+    <p>This node can be used to get site information from a Futurehome site (smarthub) like mode.</p>
+    
+    <p>No payload required. Triggered by input.</p>
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('siteState',{
+        category: 'futurehome',
+        color: '#EF4C57',
+        defaults: {
+            user: {type:"futurehome-login",required:true},
+            name: {value:""}
+        },
+        inputs:1,
+        outputs:1,
+        icon: "site.png",
+        align: 'left',
+        paletteLabel: function() {
+            return "get site info";
+        },
+        label: function() {
+            return this.name||"get site info";
+        },
+        oneditprepare: function() {
+        },
+        oneditsave: function() {
+        },
+        oneditcancel: function() {
+        }
+    });
+</script>
 
 <script type="text/x-red" data-template-name="device">
      <div class="form-row">
