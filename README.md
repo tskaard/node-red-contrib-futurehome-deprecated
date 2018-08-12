@@ -13,7 +13,7 @@ To install the stable version use the `Menu - Manage palette` option and search 
 	npm i node-red-contrib-futurehome
 
 ## Nodes
-There are a total of 5 nodes. Two used for connecting to the system using websocket, three used for sending different commands to the system.
+There are a total of 8 nodes. Two used for connecting to the system using websocket, three used for sending different commands to the system.
 
 
 ![](static/nodes.png "Nodes")
@@ -22,6 +22,8 @@ There are a total of 5 nodes. Two used for connecting to the system using websoc
 ### site (connect to site)
 This node is used to connect to a Futurehome site, and output the data comming from the site. The data can be anything from a device changing state, a mode change, or the temperature setpoint in a room.
 
+### sitestate (get site info)
+This node is used to fetch information about the site. This can for example be the mode of the site. Home/away/holiday etc.. No payload required.
 
 ### device (connect to device)
 This node is used to connect to a device in the Futurehome system, and output changes from the device. This can be a magnet contact reporting open/close state, a motion sensor reporting motion, or a light turing on/off.
