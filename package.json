@@ -13,12 +13,5 @@
     "futurehome",
     "smart home",
     "iot"
-  ],
-  "node-red": {
-    "nodes": {
-      "futurehome-login": "futurehome/futurehome-login.js",
-      "input": "futurehome/input.js",
-      "output": "futurehome/output.js"
-    }
-  }
+  ]
 }
